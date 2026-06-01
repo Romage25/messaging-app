@@ -11,6 +11,11 @@ new class extends Component {
     public $conversation = null;
     public $messages = [];
     public $message = '';
+    public $conversationId = null;
+
+    protected $listeners = [
+        'refreshMessages' => 'loadMessages',
+    ];
 
     public function mount()
     {
@@ -36,7 +41,9 @@ new class extends Component {
             $this->conversation->users()->attach([auth()->id(), $userId]);
         }
 
-        $this->loadMessages();
+        $this->conversationId = $this->conversation->id;
+
+        $this->dispatch('setConversation', $this->conversationId);
     }
 
     public function loadMessages()
@@ -54,13 +61,17 @@ new class extends Component {
             return;
         }
 
-        $this->conversation->messages()->create([
+        $message = $this->conversation->messages()->create([
             'user_id' => auth()->id(),
             'message' => $this->message,
         ]);
 
         $this->message = '';
-        $this->loadMessages();
+
+        // update sender instantly
+        $this->messages[] = $message;
+
+        broadcast(new \App\Events\MessageSent($message))->toOthers();
     }
 };
 ?>
@@ -95,7 +106,7 @@ new class extends Component {
                 </div>
 
                 <!-- MESSAGES (ONLY SCROLL AREA) -->
-                <div class="flex-1 overflow-y-auto p-4 space-y-2" wire:poll.2s="loadMessages">
+                <div class="flex-1 overflow-y-auto p-4 space-y-2">
                     @foreach ($messages as $msg)
                         <div class="flex {{ $msg->user_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
                             <div
