@@ -24,6 +24,11 @@
                     wire:navigate>
                     {{ __('Messages') }}
                 </flux:sidebar.item>
+
+                <flux:sidebar.item icon="home" :href="route('mail')" :current="request()->routeIs('mail')"
+                    wire:navigate>
+                    {{ __('Test Mail') }}
+                </flux:sidebar.item>
             </flux:sidebar.group>
         </flux:sidebar.nav>
 
