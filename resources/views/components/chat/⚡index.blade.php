@@ -43,6 +43,8 @@ new class extends Component {
 
         $this->conversationId = $this->conversation->id;
 
+        $this->loadMessages();
+
         $this->dispatch('setConversation', $this->conversationId);
     }
 
