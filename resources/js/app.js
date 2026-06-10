@@ -33,4 +33,12 @@ document.addEventListener('livewire:init', () => {
             });
     });
 
+    Livewire.on('scrollToBottom', () => {
+        setTimeout(() => {
+            const el = document.getElementById('messagesContainer');
+            if (!el) return;
+
+            el.scrollTop = el.scrollHeight;
+        }, 0);
+    });
 });

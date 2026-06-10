@@ -55,6 +55,8 @@ new class extends Component {
         }
 
         $this->messages = $this->conversation->messages()->with('user')->orderBy('id')->get();
+
+        $this->dispatch('scrollToBottom');
     }
 
     public function sendMessage()
@@ -74,6 +76,8 @@ new class extends Component {
         $this->messages[] = $message;
 
         broadcast(new \App\Events\MessageSent($message))->toOthers();
+
+        $this->dispatch('scrollToBottom');
     }
 };
 ?>
@@ -108,7 +112,7 @@ new class extends Component {
                 </div>
 
                 <!-- MESSAGES (ONLY SCROLL AREA) -->
-                <div class="flex-1 overflow-y-auto p-4 space-y-2">
+                <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-2">
                     @foreach ($messages as $msg)
                         <div class="flex {{ $msg->user_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
                             <div
